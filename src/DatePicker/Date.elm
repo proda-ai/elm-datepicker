@@ -6,7 +6,6 @@ module DatePicker.Date
         , formatMonth
         , fromPosix
         , weekdayToInterval
-        , firstOfMonth
         , changeYear
         , yearRange
         )
@@ -148,57 +147,6 @@ weekdayToInterval weekday =
 
         Sun ->
             Sunday
-
-
-repeat : (a -> a) -> Int -> a -> a
-repeat f =
-    let
-        go n x =
-            if n == 0 then
-                x
-            else
-                go (n - 1) (f x)
-    in
-        go
-
-
-firstOfMonth : Date -> Date
-firstOfMonth date =
-    Date.fromCalendarDate (year date) (month date) 1
-
-
-dayToString : Int -> String
-dayToString day =
-    if day < 10 then
-        "0" ++ String.fromInt day
-    else
-        String.fromInt day
-
-
-dayToInt : Date.Weekday -> Int
-dayToInt day =
-    case day of
-        Mon ->
-            1
-
-        Tue ->
-            2
-
-        Wed ->
-            3
-
-        Thu ->
-            4
-
-        Fri ->
-            5
-
-        Sat ->
-            6
-
-        Sun ->
-            7
-
 
 changeYear : Date -> String -> Date
 changeYear current newYear =
