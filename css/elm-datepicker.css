@@ -8,7 +8,7 @@
   position: absolute;
   border: 1px solid #CCC;
   z-index: 10;
-  background: #FFFFFF; }
+  background-color: white; }
 
 .elm-datepicker--picker-header,
 .elm-datepicker--weekdays {
@@ -20,7 +20,8 @@
 
 .elm-datepicker--prev-container,
 .elm-datepicker--next-container {
-  flex: 0 1 auto; }
+  flex: 0 1 auto;
+  cursor: pointer; }
 
 .elm-datepicker--month-container {
   flex: 1 1 auto;

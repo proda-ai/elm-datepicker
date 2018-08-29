@@ -38,7 +38,7 @@ module DatePicker
 import Date exposing (Date, Weekday(..), Month, day, month, year)
 import DatePicker.Date exposing (..)
 import Html exposing (..)
-import Html.Attributes as Attrs exposing (href, placeholder, tabindex, type_, value, selected)
+import Html.Attributes as Attrs exposing (placeholder, tabindex, type_, value, selected)
 import Html.Events exposing (on, onBlur, onClick, onInput, onFocus, targetValue)
 import Html.Keyed
 import Json.Decode as Json
@@ -291,7 +291,6 @@ prepareDates date firstDayOfWeek =
         end =
             Date.add Date.Months 1 firstOfMonth
                 |> Date.ceiling weekdayAsInterval
-                |> Date.add Date.Days -1
     in
         { currentMonth = date
         , currentDates = Date.range Date.Day 1 start end
@@ -517,12 +516,18 @@ datePicker pickedDate settings ({ focused, today } as model) =
                 |> Maybe.map (\pdate -> Date.toRataDie pdate == Date.toRataDie d)
                 |> Maybe.withDefault False
 
+        isToday d =
+            (Date.toRataDie (Debug.log "d" d) == Date.toRataDie (Debug.log "today" today))
+
+        isOtherMonth d =
+            (month currentDate /= month d)
+
         dayList =
             (groupDates currentDates)
                 |> List.map
                     (\rowDays ->
                         tr [ class "row" ]
-                            (List.map (viewDay settings picked currentDate) rowDays)
+                            (List.map (viewDay settings picked isOtherMonth isToday) rowDays)
                     )
 
         onChange handler =
@@ -581,8 +586,8 @@ datePicker pickedDate settings ({ focused, today } as model) =
             ]
 
 
-viewDay : Settings -> (Date -> Bool) -> Date -> Date -> Html Msg
-viewDay settings picked currentDate d =
+viewDay : Settings -> (Date -> Bool) -> (Date -> Bool) -> (Date -> Bool) -> Date -> Html Msg
+viewDay settings picked isOtherMonth isToday d =
     let
         disabled =
             settings.isDisabled d
@@ -601,8 +606,8 @@ viewDay settings picked currentDate d =
                 [ ( "day", True )
                 , ( "disabled", disabled )
                 , ( "picked", picked d )
-                , ( "today", Date.toRataDie d == Date.toRataDie currentDate )
-                , ( "other-month", month currentDate /= month d )
+                , ( "today", isToday d )
+                , ( "other-month", isOtherMonth d )
                 ]
              ]
                 ++ props
