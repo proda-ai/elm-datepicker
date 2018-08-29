@@ -346,56 +346,61 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
             ( DatePicker { model | inputText = Just text }, Cmd.none, NoChange )
 
         SubmitText ->
-            let
-                isWhitespace =
-                    String.trim >> String.isEmpty
+            case forceOpen of
+                True ->
+                    ( DatePicker model, Cmd.none, NoChange )
 
-                dateEvent =
+                False ->
                     let
-                        text =
-                            model.inputText |> Maybe.withDefault ""
+                        isWhitespace =
+                            String.trim >> String.isEmpty
+
+                        dateEvent =
+                            let
+                                text =
+                                    model.inputText |> Maybe.withDefault ""
+                            in
+                                if isWhitespace text then
+                                    Changed Nothing
+                                else
+                                    text
+                                        |> settings.parser
+                                        |> Result.map
+                                            (Changed
+                                                << (\date ->
+                                                        if settings.isDisabled date then
+                                                            Nothing
+                                                        else
+                                                            Just date
+                                                   )
+                                            )
+                                        |> Result.withDefault NoChange
                     in
-                        if isWhitespace text then
-                            Changed Nothing
-                        else
-                            text
-                                |> settings.parser
-                                |> Result.map
-                                    (Changed
-                                        << (\date ->
-                                                if settings.isDisabled date then
-                                                    Nothing
-                                                else
-                                                    Just date
-                                           )
-                                    )
-                                |> Result.withDefault NoChange
-            in
-                ( DatePicker <|
-                    { model
-                        | inputText =
-                            case dateEvent of
-                                Changed change ->
-                                    Nothing
-
-                                NoChange ->
-                                    model.inputText
-                        , focused =
-                            case dateEvent of
-                                Changed change ->
-                                    case change of
-                                        Just date ->
-                                            Just date
-
-                                        Nothing ->
+                        ( DatePicker <|
+                            { model
+                                | inputText =
+                                    case dateEvent of
+                                        Changed change ->
                                             Nothing
 
-                                NoChange ->
-                                    model.focused
-                    }
-                , Cmd.none
-                , dateEvent
-                )
+                                        NoChange ->
+                                            model.inputText
+                                , focused =
+                                    case dateEvent of
+                                        Changed change ->
+                                            case change of
+                                                Just date ->
+                                                    Just date
+
+                                                Nothing ->
+                                                    Nothing
+
+                                        NoChange ->
+                                            model.focused
+                            }
+                        , Cmd.none
+                        , dateEvent
+                        )
 
         Focus ->
             ( DatePicker { model | open = True, forceOpen = False }, Cmd.none, NoChange )
@@ -517,7 +522,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
                 |> Maybe.withDefault False
 
         isToday d =
-            (Date.toRataDie (Debug.log "d" d) == Date.toRataDie (Debug.log "today" today))
+            (Date.toRataDie d == Date.toRataDie today)
 
         isOtherMonth d =
             (month currentDate /= month d)
