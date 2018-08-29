@@ -1,9 +1,9 @@
 module Simple exposing (main)
 
-import Date exposing (Date, Day(..), day, dayOfWeek, month, year)
+import Date exposing (Date, Weekday(..), day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, h1, text)
-
+import Browser
 
 type Msg
     = ToDatePicker DatePicker.Msg
@@ -19,8 +19,8 @@ settings : DatePicker.Settings
 settings =
     let
         isDisabled date =
-            dayOfWeek date
-                |> flip List.member [ Sat, Sun ]
+            [ Sat, Sun ]
+                |> List.member (weekday date)
     in
         { defaultSettings | isDisabled = isDisabled }
 
@@ -31,59 +31,55 @@ init =
         ( datePicker, datePickerFx ) =
             DatePicker.init
     in
-        { date = Nothing
-        , datePicker = datePicker
-        }
-            ! [ Cmd.map ToDatePicker datePickerFx ]
+        ( { date = Nothing
+          , datePicker = datePicker
+          }
+        , Cmd.map ToDatePicker datePickerFx
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ date, datePicker } as model) =
     case msg of
-        ToDatePicker msg ->
+        ToDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerFx, dateEvent ) =
-                    DatePicker.update settings msg datePicker
+                    DatePicker.update settings subMsg datePicker
 
                 newDate =
                     case dateEvent of
-                        Changed newDate ->
-                            newDate
+                        Changed changedDate ->
+                            changedDate
 
                         _ ->
                             date
             in
-                { model
+                ( { model
                     | date = newDate
                     , datePicker = newDatePicker
-                }
-                    ! [ Cmd.map ToDatePicker datePickerFx ]
+                  }
+                , Cmd.map ToDatePicker datePickerFx
+                )
 
 
 view : Model -> Html Msg
-view ({ date, datePicker } as model) =
+view model =
     div []
-        [ case date of
+        [ case model.date of
             Nothing ->
                 h1 [] [ text "Pick a date" ]
 
             Just date ->
-                h1 [] [ text <| formatDate date ]
-        , DatePicker.view date settings datePicker
+                h1 [] [ text <| Date.toFormattedString "MMM d, yyyy" date ]
+        , DatePicker.view model.date settings model.datePicker
             |> Html.map ToDatePicker
         ]
 
-
-formatDate : Date -> String
-formatDate d =
-    toString (month d) ++ " " ++ toString (day d) ++ ", " ++ toString (year d)
-
-
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { init = init
-        , update = update
+    Browser.element
+        { init = \_ -> init
         , view = view
-        , subscriptions = always Sub.none
+        , update = update
+        , subscriptions = \_ -> Sub.none
         }

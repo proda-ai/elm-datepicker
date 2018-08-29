@@ -35,7 +35,9 @@
 
     <script src="simple.js"></script>
     <script>
-      Elm.Simple.embed(document.getElementById("simple"));
+      var app = Elm.Simple.init({
+          node: document.getElementById("simple")
+      });
     </script>
   </body>
 </html>
