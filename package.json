@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/elm-community/elm-datepicker#readme",
   "devDependencies": {
-    "nightwatch": "^0.9.16"
+    "nightwatch": "^0.9.21"
   }
 }
