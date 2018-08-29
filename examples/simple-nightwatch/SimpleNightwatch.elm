@@ -3,12 +3,14 @@ module SimpleNightwatch exposing (main)
 {-| This is a simple test suitable for automated browser testing (such as with nightwatch.js)
 -}
 
-import Date exposing (Date, Day(..), day, dayOfWeek, month, year)
+import Date exposing (Date, Weekday(..), day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, h1, text, button)
 import Process
 import Task
 import Time
+import Browser
+
 
 type Msg
     = ToDatePicker DatePicker.Msg
@@ -30,11 +32,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         moonLandingDate =
-            Date.fromString "1969-07-20"
-                |> Result.toMaybe
-                |> Maybe.withDefault (Date.fromTime 0)
-
-        -- the fromTime 0 is just to keep the compiler happy - it will never be called
+            Date.fromCalendarDate 1969 Date.Jul 20
     in
         ( { date = Nothing
           , datePicker = DatePicker.initFromDate moonLandingDate
@@ -48,27 +46,28 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ date, datePicker } as model) =
     case msg of
-        ToDatePicker msg ->
+        ToDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerFx, dateEvent ) =
-                    DatePicker.update settings msg datePicker
+                    DatePicker.update settings subMsg datePicker
 
                 newDate =
                     case dateEvent of
-                        Changed newDate ->
-                            newDate
+                        Changed changedDate ->
+                            changedDate
 
                         _ ->
                             date
             in
-                { model
+                ( { model
                     | date = newDate
                     , datePicker = newDatePicker
-                }
-                    ! [ Cmd.map ToDatePicker datePickerFx ]
+                  }
+                , Cmd.map ToDatePicker datePickerFx
+                )
 
         NoOp ->
-            model ! []
+            ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -78,29 +77,23 @@ view ({ date, datePicker } as model) =
             Nothing ->
                 h1 [] [ text "Pick a date" ]
 
-            Just date ->
-                h1 [] [ text <| formatDate date ]
+            Just d ->
+                h1 [] [ text <| Date.toFormattedString "MMM dd, yyyy" d ]
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
         ]
 
-
-formatDate : Date -> String
-formatDate d =
-    toString (month d) ++ " " ++ toString (day d) ++ ", " ++ toString (year d)
-
-
 delayedNoOpCmd : { seconds : Float } -> Cmd Msg
 delayedNoOpCmd { seconds } =
-        Process.sleep (seconds * Time.second)
+    Process.sleep (seconds * 1000)
         |> Task.perform (\_ -> NoOp)
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { init = init
-        , update = update
+    Browser.element
+        { init = \_ -> init
         , view = view
-        , subscriptions = always Sub.none
+        , update = update
+        , subscriptions = \_ -> Sub.none
         }

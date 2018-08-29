@@ -1,8 +1,9 @@
 module Range exposing (main)
 
-import Date exposing (Date, Day(..), day, dayOfWeek, month, year)
+import Date exposing (Date, Weekday(..), day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, h1, text)
+import Browser
 
 
 type Msg
@@ -41,10 +42,10 @@ startSettings endDate =
                 Nothing ->
                     commonSettings.isDisabled
 
-                Just endDate ->
+                Just date ->
                     \d ->
-                        Date.toTime d
-                            > Date.toTime endDate
+                        Date.toRataDie d
+                            > Date.toRataDie date
                             || (commonSettings.isDisabled d)
     in
         { commonSettings
@@ -66,10 +67,10 @@ endSettings startDate =
                 Nothing ->
                     commonSettings.isDisabled
 
-                Just startDate ->
+                Just date ->
                     \d ->
-                        Date.toTime d
-                            < Date.toTime startDate
+                        Date.toRataDie d
+                            < Date.toRataDie date
                             || (commonSettings.isDisabled d)
     in
         { commonSettings
@@ -87,59 +88,60 @@ init =
         ( endDatePicker, endDatePickerFx ) =
             DatePicker.init
     in
-        { startDate = Nothing
-        , startDatePicker = startDatePicker
-        , endDate = Nothing
-        , endDatePicker = endDatePicker
-        }
-            ! ([ Cmd.map ToStartDatePicker startDatePickerFx ]
-                ++ [ Cmd.map
-                        ToEndDatePicker
-                        endDatePickerFx
-                   ]
-              )
+        ( { startDate = Nothing
+          , startDatePicker = startDatePicker
+          , endDate = Nothing
+          , endDatePicker = endDatePicker
+          }
+        , Cmd.batch
+            [ Cmd.map ToStartDatePicker startDatePickerFx
+            , Cmd.map ToEndDatePicker endDatePickerFx
+            ]
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ToStartDatePicker msg ->
+        ToStartDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerFx, dateEvent ) =
-                    DatePicker.update (startSettings model.endDate) msg model.startDatePicker
+                    DatePicker.update (startSettings model.endDate) subMsg model.startDatePicker
 
                 newDate =
                     case dateEvent of
-                        Changed newDate ->
-                            newDate
+                        Changed changedDate ->
+                            changedDate
 
                         _ ->
                             model.startDate
             in
-                { model
+                ( { model
                     | startDate = newDate
                     , startDatePicker = newDatePicker
-                }
-                    ! [ Cmd.map ToStartDatePicker datePickerFx ]
+                  }
+                , Cmd.map ToStartDatePicker datePickerFx
+                )
 
-        ToEndDatePicker msg ->
+        ToEndDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerFx, dateEvent ) =
-                    DatePicker.update (endSettings model.startDate) msg model.endDatePicker
+                    DatePicker.update (endSettings model.startDate) subMsg model.endDatePicker
 
                 newDate =
                     case dateEvent of
-                        Changed newDate ->
-                            newDate
+                        Changed changedDate ->
+                            changedDate
 
                         _ ->
                             model.endDate
             in
-                { model
+                ( { model
                     | endDate = newDate
                     , endDatePicker = newDatePicker
-                }
-                    ! [ Cmd.map ToEndDatePicker datePickerFx ]
+                  }
+                , Cmd.map ToEndDatePicker datePickerFx
+                )
 
 
 view : Model -> Html Msg
@@ -159,26 +161,26 @@ viewRange start end =
         ( Nothing, Nothing ) ->
             h1 [] [ text "Pick dates" ]
 
-        ( Just start, Nothing ) ->
-            h1 [] [ text <| formatDate start ++ " – Pick end date" ]
+        ( Just s, Nothing ) ->
+            h1 [] [ text <| formatDate s ++ " – Pick end date" ]
 
-        ( Nothing, Just end ) ->
-            h1 [] [ text <| "Pick start date – " ++ formatDate end ]
+        ( Nothing, Just e ) ->
+            h1 [] [ text <| "Pick start date – " ++ formatDate e ]
 
-        ( Just start, Just end ) ->
-            h1 [] [ text <| formatDate start ++ " – " ++ formatDate end ]
+        ( Just s, Just e ) ->
+            h1 [] [ text <| formatDate s ++ " – " ++ formatDate e ]
 
 
 formatDate : Date -> String
 formatDate d =
-    toString (month d) ++ " " ++ toString (day d) ++ ", " ++ toString (year d)
+    Date.toFormattedString "MMM dd, yyyy" d
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { init = init
-        , update = update
+    Browser.element
+        { init = \_ -> init
         , view = view
-        , subscriptions = always Sub.none
+        , update = update
+        , subscriptions = \_ -> Sub.none
         }

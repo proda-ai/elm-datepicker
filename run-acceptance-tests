@@ -8,7 +8,7 @@ cd examples && make simple-nightwatch-example && cd ..
 
 # start some required background processes
 
-elm-reactor &
+elm reactor &
 ELM_REACTOR_PID=$!
 
 chromedriver &

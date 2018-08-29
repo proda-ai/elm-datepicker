@@ -21,7 +21,9 @@
 
     <script src="bootstrap.js"></script>
     <script>
-      Elm.Bootstrap.embed(document.getElementById("app"));
+      var app = Elm.Bootstrap.init({
+          node: document.getElementById("app")
+      });
     </script>
   </body>
 </html>

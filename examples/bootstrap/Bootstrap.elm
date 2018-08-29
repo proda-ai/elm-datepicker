@@ -1,9 +1,10 @@
 module Bootstrap exposing (main)
 
-import Date exposing (Date, Day(..), day, dayOfWeek, month, year)
+import Date exposing (Date, Weekday(..), day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, form, h1, input, label, text)
 import Html.Attributes exposing (class, type_, value)
+import Browser
 
 
 type Msg
@@ -20,8 +21,8 @@ settings : DatePicker.Settings
 settings =
     let
         isDisabled date =
-            dayOfWeek date
-                |> flip List.member [ Sat, Sun ]
+            [ Sat, Sun ]
+                |> List.member (weekday date)
     in
         { defaultSettings
             | isDisabled = isDisabled
@@ -37,21 +38,22 @@ init =
         ( datePicker, datePickerFx ) =
             DatePicker.init
     in
-        { date = Nothing
-        , datePicker = datePicker
-        }
-            ! [ Cmd.map ToDatePicker datePickerFx ]
+        ( { date = Nothing
+          , datePicker = datePicker
+          }
+        , Cmd.map ToDatePicker datePickerFx
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ datePicker } as model) =
     case msg of
-        ToDatePicker msg ->
+        ToDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerFx, event ) =
-                    DatePicker.update settings msg datePicker
+                    DatePicker.update settings subMsg datePicker
             in
-                { model
+                ( { model
                     | date =
                         case event of
                             Changed date ->
@@ -60,8 +62,9 @@ update msg ({ datePicker } as model) =
                             NoChange ->
                                 model.date
                     , datePicker = newDatePicker
-                }
-                    ! [ Cmd.map ToDatePicker datePickerFx ]
+                  }
+                , Cmd.map ToDatePicker datePickerFx
+                )
 
 
 view : Model -> Html Msg
@@ -82,17 +85,11 @@ view ({ date, datePicker } as model) =
             ]
         ]
 
-
-formatDate : Date -> String
-formatDate d =
-    toString (month d) ++ " " ++ toString (day d) ++ ", " ++ toString (year d)
-
-
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { init = init
-        , update = update
+    Browser.element
+        { init = \_ -> init
         , view = view
-        , subscriptions = always Sub.none
+        , update = update
+        , subscriptions = \_ -> Sub.none
         }
