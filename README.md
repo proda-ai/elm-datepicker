@@ -1,11 +1,29 @@
-# elm-datepicker
+# History
+
+This is a fork of the `elm-community/elm-datepicker` package ported to support elm 0.19.
+`elm-datepicker` is a reusable date picker component in Elm.
+
+## Dependencies
+
+This package depends on [justinmimbs/date](https://github.com/justinmimbs/date).
+It uses its date representation: Dates without time and timezones.
+
+## Breaking Changes
+
+During the port to 0.19 two breaking changes were made:
+
+
+- parseDate now defaults to Date.fromIsoString. Before it was elm-lang/Date.fromString which was much more flexible
+
+- The --today-css class is now only added to cells that represent todays or the initialized date. Not the picked date. (Bugfix or Breaking change. You may decide)
+
+
+
+## Install
 
 ``` shell
-elm package install elm-community/elm-datepicker
+elm package install CurrySoftware/elm-datepicker
 ```
-
-A reusable date picker component in Elm.
-
 
 ## Usage
 
@@ -14,12 +32,12 @@ The `DatePicker.init` function initialises the DatePicker. It returns the initia
 **Note** Make sure you don't throw away the initial `Cmd`!
 
 ```elm
-   
+
 init : (Model, Cmd Msg)
 ...
     let
         ( datePicker, datePickerCmd ) =
-            DatePicker.init 
+            DatePicker.init
     in
         (
             { model | datePicker = datePicker },
@@ -43,9 +61,9 @@ view model =
     ...
     div [] [
         DatePicker.view
-            model.date 
+            model.date
             someSettings
-            model.startDatePicker 
+            model.startDatePicker
          |> Html.map SetDatePicker
         ]
 
@@ -54,7 +72,7 @@ view model =
 To handle `Msg` in your update function, you should unwrap the `DatePicker.Msg` and pass it down to the `DatePicker.update` function. The `DatePicker.update` function returns:
 
 * the new model
-* any command 
+* any command
 * the new date as a `DateEvent (Maybe Date)`, where `DateEvent` is really just `Maybe` with different semantics, to avoid a potentially confusing `Maybe Maybe`.
 
 To create the settings to pass to `update`, DatePicker.defaultSettings` is provided to make it easier to use. You only have to override the settings that you are interested in.
@@ -63,7 +81,7 @@ To create the settings to pass to `update`, DatePicker.defaultSettings` is provi
 
 ```elm
 someSettings : DatePicker.Settings
-someSettings = 
+someSettings =
     { defaultSettings
         | inputClassList = [ ( "form-control", True ) ]
         , inputId = Just "datepicker"
@@ -99,7 +117,7 @@ update msg model =
 
 See the [examples][examples] folder or try it on ellie-app: [simple] example and [bootstrap] example.
 
-[examples]: https://github.com/elm-community/elm-datepicker/tree/master/examples
+[examples]: https://github.com/CurrySoftware/elm-datepicker/tree/master/examples
 [simple]: https://ellie-app.com/5QFsDgQVva1/0
 [bootstrap]: https://ellie-app.com/pwGJj5T6TBa1/0
 
@@ -110,8 +128,8 @@ The CSS for the date picker is distributed separately.  You can grab
 the compiled CSS from [here][compiled] or you can grab the SCSS source
 from [here][scss].
 
-[compiled]: https://github.com/elm-community/elm-datepicker/blob/master/css/elm-datepicker.css
-[scss]: https://github.com/elm-community/elm-datepicker/blob/master/css/elm-datepicker.scss
+[compiled]: https://github.com/CurrySoftware/elm-datepicker/blob/master/css/elm-datepicker.css
+[scss]: https://github.com/CurrySoftware/elm-datepicker/blob/master/css/elm-datepicker.scss
 
 
 ## Running the acceptance tests
