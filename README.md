@@ -118,8 +118,8 @@ update msg model =
 See the [examples][examples] folder or try it on ellie-app: [simple] example and [bootstrap] example.
 
 [examples]: https://github.com/CurrySoftware/elm-datepicker/tree/master/examples
-[simple]: https://ellie-app.com/5QFsDgQVva1/0
-[bootstrap]: https://ellie-app.com/pwGJj5T6TBa1/0
+[simple]: https://ellie-app.com/3c5q4kSYVmxa1
+[bootstrap]: https://ellie-app.com/3c5sc4yyFwQa1
 
 
 ## CSS
