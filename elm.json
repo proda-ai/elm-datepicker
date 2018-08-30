@@ -1,9 +1,9 @@
 {
     "type": "package",
-    "name": "elm-commnity/elm-datepicker",
+    "name": "CurrySoftware/elm-datepicker",
     "summary": "A reusable date picker component",
     "license": "BSD-3-Clause",
-    "version": "8.0.0",
+    "version": "1.0.0",
     "exposed-modules": [
         "DatePicker"
     ],

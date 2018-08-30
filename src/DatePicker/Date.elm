@@ -155,7 +155,8 @@ changeYear current newYear =
             Date.fromCalendarDate year (month current) (day current)
 
         Nothing ->
-            Debug.todo ("Unknown year " ++ newYear)
+            -- We couldn't decode the year to change to... do nothing!
+            current
 
 
 yearRange : { currentMonth : Date, today : Date } -> YearRange -> List Int
