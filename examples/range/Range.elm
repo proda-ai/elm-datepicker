@@ -110,8 +110,8 @@ update msg model =
 
                 newDate =
                     case dateEvent of
-                        Changed changedDate ->
-                            changedDate
+                        Picked changedDate ->
+                            Just changedDate
 
                         _ ->
                             model.startDate
@@ -130,8 +130,8 @@ update msg model =
 
                 newDate =
                     case dateEvent of
-                        Changed changedDate ->
-                            changedDate
+                        Picked changedDate ->
+                            Just changedDate
 
                         _ ->
                             model.endDate

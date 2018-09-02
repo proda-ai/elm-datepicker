@@ -56,10 +56,10 @@ update msg ({ datePicker } as model) =
                 ( { model
                     | date =
                         case event of
-                            Changed date ->
-                                date
+                            Picked date ->
+                                Just date
 
-                            NoChange ->
+                            _ ->
                                 model.date
                     , datePicker = newDatePicker
                   }

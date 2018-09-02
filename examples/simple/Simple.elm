@@ -48,8 +48,8 @@ update msg ({ date, datePicker } as model) =
 
                 newDate =
                     case dateEvent of
-                        Changed changedDate ->
-                            changedDate
+                        Picked changedDate ->
+                            Just changedDate
 
                         _ ->
                             date

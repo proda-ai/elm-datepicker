@@ -1,6 +1,7 @@
 const url = "http://localhost:8000/examples/simple-nightwatch/index.html";
 const textInputSelector = ".elm-datepicker--input";
 const topLeftDaySelector = ".elm-datepicker--row:first-child .elm-datepicker--day:first-child";
+const errorMsgSelector = "#error"
 
 
 const defaultWait = 1000;
@@ -21,7 +22,7 @@ module.exports = {
     client.url(url);
     client.expect.element(textInputSelector).to.be.present.before(defaultWait);
     client.click(textInputSelector);
-    slowlySendKeys(client, textInputSelector, "1980-01-01");
+    client.sendKeys(textInputSelector, "1980-01-01");
     client.expect.element(topLeftDaySelector).to.be.present.before(defaultWait);
     client.click(topLeftDaySelector);
     client.expect.element(textInputSelector).value.to.equal("1969/06/29").before(defaultWait);
@@ -32,7 +33,7 @@ module.exports = {
     client.url(url);
     client.expect.element(textInputSelector).to.be.present.before(defaultWait);
     client.click(textInputSelector);
-    slowlySendKeys(client, textInputSelector, "1980-01-01");
+    client.sendKeys(textInputSelector, "1980-01-01");
     client.sendKeys(textInputSelector, client.Keys.ENTER);
     client.expect.element(topLeftDaySelector).to.be.present.before(defaultWait);
     client.expect.element(".elm-datepicker--row:first-child .elm-datepicker--day:nth-child(3)")
@@ -55,6 +56,34 @@ module.exports = {
     client.click(textInputSelector);
     client.sendKeys(textInputSelector, longTextExample);
     client.expect.element(textInputSelector).value.to.equal(longTextExample).before(defaultWait);
+    client.end();
+  },
+
+  'Manually entered invalid dates should be interceptable' : function (client) {
+    client.url(url);
+    client.expect.element(textInputSelector).to.be.present.before(defaultWait);
+    client.click(textInputSelector);
+    client.sendKeys(textInputSelector, "1980-01-01a");
+    client.sendKeys(textInputSelector, client.Keys.ENTER);
+    client.expect.element(errorMsgSelector).to.be.present.before(defaultWait);
+    client.expect.element(errorMsgSelector).text.to.contain("Parser error: String is not in IS0 8601 date format").before(defaultWait);
+    client.click(topLeftDaySelector);
+    client.expect.element(textInputSelector).value.to.equal("1969/06/29").before(defaultWait);
+    client.expect.element(errorMsgSelector).to.not.be.present.before(defaultWait);
+    client.end();
+  },
+
+  'Manually entered disabled dates should be interceptable' : function (client) {
+    client.url(url);
+    client.expect.element(textInputSelector).to.be.present.before(defaultWait);
+    client.click(textInputSelector);
+    client.sendKeys(textInputSelector, "1980-01-02");
+    client.sendKeys(textInputSelector, client.Keys.ENTER);
+    client.expect.element(errorMsgSelector).to.be.present.before(defaultWait);
+    client.expect.element(errorMsgSelector).text.to.contain("Date disabled: 1980-01-02").before(defaultWait);
+    client.click(topLeftDaySelector);
+    client.expect.element(textInputSelector).value.to.equal("1969/06/29").before(defaultWait);
+    client.expect.element(errorMsgSelector).to.not.be.present.before(defaultWait);
     client.end();
   },
 

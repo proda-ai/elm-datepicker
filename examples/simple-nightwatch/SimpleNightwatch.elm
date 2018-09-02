@@ -4,8 +4,9 @@ module SimpleNightwatch exposing (main)
 -}
 
 import Date exposing (Date, Weekday(..), day, weekday, month, year)
-import DatePicker exposing (defaultSettings, DateEvent(..))
-import Html exposing (Html, div, h1, text, button)
+import DatePicker exposing (defaultSettings, DateEvent(..), InputError(..))
+import Html exposing (Html, div, h1, h2, text, button)
+import Html.Attributes exposing (id)
 import Process
 import Task
 import Time
@@ -20,12 +21,15 @@ type Msg
 type alias Model =
     { date : Maybe Date
     , datePicker : DatePicker.DatePicker
+    , error : Maybe String
     }
 
 
 settings : DatePicker.Settings
 settings =
-    defaultSettings
+     { defaultSettings
+         | isDisabled = (\date -> modBy 2 (Date.toRataDie date) == 0)
+     }
 
 
 init : ( Model, Cmd Msg )
@@ -36,6 +40,7 @@ init =
     in
         ( { date = Nothing
           , datePicker = DatePicker.initFromDate moonLandingDate
+          , error = Nothing
           }
           -- trigger a NoOp command after two seconds. This is used to test
           -- that re-renders of the app do not cause things to dissapear.
@@ -53,15 +58,30 @@ update msg ({ date, datePicker } as model) =
 
                 newDate =
                     case dateEvent of
-                        Changed changedDate ->
-                            changedDate
+                        Picked changedDate ->
+                            Just changedDate
 
                         _ ->
                             date
+
+                error =
+                    case dateEvent of
+                        FailedInput (Invalid err) ->
+                            Just <| "Parser error: " ++ err
+
+                        FailedInput (Disabled d) ->
+                            Just <| "Date disabled: " ++ Date.toIsoString d
+
+                        Picked _ ->
+                            Nothing
+
+                        None ->
+                            model.error
             in
                 ( { model
                     | date = newDate
                     , datePicker = newDatePicker
+                    , error = error
                   }
                 , Cmd.map ToDatePicker datePickerFx
                 )
@@ -71,7 +91,7 @@ update msg ({ date, datePicker } as model) =
 
 
 view : Model -> Html Msg
-view ({ date, datePicker } as model) =
+view ({ date, datePicker, error } as model) =
     div []
         [ case date of
             Nothing ->
@@ -79,9 +99,16 @@ view ({ date, datePicker } as model) =
 
             Just d ->
                 h1 [] [ text <| Date.toFormattedString "MMM dd, yyyy" d ]
+        , case error of
+            Nothing ->
+                text ""
+
+            Just err ->
+                h2 [ id "error" ] [ text err ]
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
         ]
+
 
 delayedNoOpCmd : { seconds : Float } -> Cmd Msg
 delayedNoOpCmd { seconds } =

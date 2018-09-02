@@ -3,6 +3,7 @@ module DatePicker
         ( Msg
         , Settings
         , DateEvent(..)
+        , InputError(..)
         , DatePicker
         , defaultSettings
         , init
@@ -51,7 +52,7 @@ import Time
 type Msg
     = CurrentDate Date
     | ChangeFocus Date
-    | Pick (Maybe Date)
+    | Pick Date
     | Text String
     | SubmitText
     | Focus
@@ -307,8 +308,14 @@ focusedDate (DatePicker model) =
 Used to represent a request, by the datepicker, to change the selected date.
 -}
 type DateEvent
-    = NoChange
-    | Changed (Maybe Date)
+    = None
+    | FailedInput InputError
+    | Picked Date
+
+
+type InputError
+    = Invalid String
+    | Disabled Date
 
 
 {-| The date picker update function. The third tuple member represents a user action to change the
@@ -318,10 +325,10 @@ update : Settings -> Msg -> DatePicker -> ( DatePicker, Cmd Msg, DateEvent )
 update settings msg (DatePicker ({ forceOpen, focused } as model)) =
     case msg of
         CurrentDate date ->
-            ( DatePicker { model | focused = Just date, today = date }, Cmd.none, NoChange )
+            ( DatePicker { model | focused = Just date, today = date }, Cmd.none, None )
 
         ChangeFocus date ->
-            ( DatePicker { model | focused = Just date }, Cmd.none, NoChange )
+            ( DatePicker { model | focused = Just date }, Cmd.none, None )
 
         Pick date ->
             ( DatePicker <|
@@ -331,63 +338,45 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
                     , focused = Nothing
                 }
             , Cmd.none
-            , Changed date
+            , Picked date
             )
 
         Text text ->
-            ( DatePicker { model | inputText = Just text }, Cmd.none, NoChange )
+            ( DatePicker { model | inputText = Just text }, Cmd.none, None )
 
         SubmitText ->
             case forceOpen of
                 True ->
-                    ( DatePicker model, Cmd.none, NoChange )
+                    ( DatePicker model, Cmd.none, None )
 
                 False ->
                     let
-                        isWhitespace =
-                            String.trim >> String.isEmpty
-
                         dateEvent =
-                            let
-                                text =
-                                    model.inputText |> Maybe.withDefault ""
-                            in
-                                if isWhitespace text then
-                                    Changed Nothing
-                                else
-                                    text
-                                        |> settings.parser
-                                        |> Result.map
-                                            (Changed
-                                                << (\date ->
-                                                        if settings.isDisabled date then
-                                                            Nothing
-                                                        else
-                                                            Just date
-                                                   )
-                                            )
-                                        |> Result.withDefault NoChange
+                            case settings.parser <| Maybe.withDefault "" model.inputText of
+                                Ok date ->
+                                    if settings.isDisabled date then
+                                        FailedInput <| Disabled date
+                                    else
+                                        Picked date
+
+                                Err e ->
+                                    FailedInput <| Invalid e
                     in
-                        ( DatePicker <|
+                        ( DatePicker
                             { model
                                 | inputText =
                                     case dateEvent of
-                                        Changed change ->
+                                        Picked _ ->
                                             Nothing
 
-                                        NoChange ->
+                                        _ ->
                                             model.inputText
                                 , focused =
                                     case dateEvent of
-                                        Changed change ->
-                                            case change of
-                                                Just date ->
-                                                    Just date
+                                        Picked date ->
+                                            Just date
 
-                                                Nothing ->
-                                                    Nothing
-
-                                        NoChange ->
+                                        _ ->
                                             model.focused
                             }
                         , Cmd.none
@@ -395,16 +384,16 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
                         )
 
         Focus ->
-            ( DatePicker { model | open = True, forceOpen = False }, Cmd.none, NoChange )
+            ( DatePicker { model | open = True, forceOpen = False }, Cmd.none, None )
 
         Blur ->
-            ( DatePicker { model | open = forceOpen }, Cmd.none, NoChange )
+            ( DatePicker { model | open = forceOpen }, Cmd.none, None )
 
         MouseDown ->
-            ( DatePicker { model | forceOpen = True }, Cmd.none, NoChange )
+            ( DatePicker { model | forceOpen = True }, Cmd.none, None )
 
         MouseUp ->
-            ( DatePicker { model | forceOpen = False }, Cmd.none, NoChange )
+            ( DatePicker { model | forceOpen = False }, Cmd.none, None )
 
 
 {-| Generate a message that will act as if the user has chosen a certain date,
@@ -419,10 +408,10 @@ Rather, it will:
 
   - close the picker
 
-    update datepickerSettings (pick (Just someDate)) datepicker
+    update datepickerSettings (pick someDate) datepicker
 
 -}
-pick : Maybe Date -> Msg
+pick : Date -> Msg
 pick =
     Pick
 
@@ -594,7 +583,7 @@ viewDay settings picked isOtherMonth isToday d =
 
         props =
             if not disabled then
-                [ onClick (Pick (Just d)) ]
+                [ onClick <| Pick d ]
             else
                 []
     in
