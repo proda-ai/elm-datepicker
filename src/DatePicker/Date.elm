@@ -4,39 +4,12 @@ module DatePicker.Date
         , initDate
         , formatDay
         , formatMonth
-        , fromPosix
         , weekdayToInterval
         , changeYear
         , yearRange
         )
 
 import Date exposing (Date, Unit(..), Interval(..), Weekday(..), Month(..), year, month, day)
-import Time
-
-
-fromPosix : Time.Zone -> Time.Posix -> Date
-fromPosix zone posix =
-    Date.fromCalendarDate
-        (Time.toYear zone posix)
-        (Time.toMonth zone posix |> timeMonthToDateMonth)
-        (Time.toDay zone posix)
-
-timeMonthToDateMonth : Time.Month -> Month
-timeMonthToDateMonth month =
-    case month of
-        Time.Jan -> Jan
-        Time.Feb -> Feb
-        Time.Mar -> Mar
-        Time.Apr -> Apr
-        Time.May -> May
-        Time.Jun -> Jun
-        Time.Jul -> Jul
-        Time.Aug -> Aug
-        Time.Sep -> Sep
-        Time.Oct -> Oct
-        Time.Nov -> Nov
-        Time.Dec -> Dec
-
 
 type alias Year =
     Int

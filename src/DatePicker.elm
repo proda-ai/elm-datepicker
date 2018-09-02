@@ -226,15 +226,7 @@ init =
         , inputText = Nothing
         , today = initDate
         }
-    , Task.perform CurrentDate
-        (Time.now
-            |> Task.andThen
-                (\posix ->
-                    Time.here
-                        |> Task.map
-                            (\zone -> fromPosix zone posix)
-                )
-        )
+    , Task.perform CurrentDate Date.today
     )
 
 
