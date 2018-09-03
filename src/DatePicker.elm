@@ -26,7 +26,7 @@ module DatePicker
 
 # Tea ☕
 
-@docs Msg, DateEvent, DatePicker
+@docs Msg, DateEvent, InputError, DatePicker
 @docs init, initFromDate, initFromDates, update, view, isOpen, focusedDate
 
 
@@ -215,7 +215,7 @@ for the date picker to behave correctly.
             ( datePicker, datePickerFx ) =
                 DatePicker.init
         in
-            { picker = datePicker } ! [ Cmd.map ToDatePicker datePickerfx ]
+            ({ picker = datePicker },  Cmd.map ToDatePicker datePickerfx)
 
 -}
 init : ( DatePicker, Cmd Msg )
@@ -234,7 +234,7 @@ init =
 {-| Initialize a DatePicker with a given Date
 
     init date =
-        { picker = DatePicker.initFromDate date } ! []
+        ({ picker = DatePicker.initFromDate date }, Cmd.none)
 
 -}
 initFromDate : Date -> DatePicker
@@ -251,7 +251,7 @@ initFromDate date =
 {-| Initialize a DatePicker with a date for today and Maybe a date picked
 
     init today date =
-        { picker = DatePicker.initFromDates today date } ! []
+        ({ picker = DatePicker.initFromDates today date }, Cmd.none)
 
 -}
 initFromDates : Date -> Maybe Date -> DatePicker
@@ -304,15 +304,28 @@ focusedDate (DatePicker model) =
     model.focused
 
 
-{-| A sugaring of `Maybe` to explicitly tell you how to interpret `Changed Nothing`, because `Just Nothing` seems somehow wrong.
-Used to represent a request, by the datepicker, to change the selected date.
+{-| The event resulting from a `DatePicker.update`.
+Three things can happen:
+
+* Nothing
+* The user might pick a date through clicking or typing
+* Or the user typed a date that is either invalid or disabled
+
+If you do not care about case error handling for invalid inputs, just matching on `Picked` should suffice.
+
+Have a look at the `nightwash-simple` example for basic error handling with `InputError`.
 -}
 type DateEvent
     = None
     | FailedInput InputError
     | Picked Date
 
+{-| When typing a date it can go wrong in two ways:
 
+* `Invalid String`: the typed string cannot be parsed into a date. The error string is given be the parser defined in the settings.
+* `Disabled Date`: a valid date was typed, but it is disabled as defined in the settings.
+
+-}
 type InputError
     = Invalid String
     | Disabled Date

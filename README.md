@@ -73,7 +73,13 @@ To handle `Msg` in your update function, you should unwrap the `DatePicker.Msg` 
 
 * the new model
 * any command
-* the new date as a `DateEvent (Maybe Date)`, where `DateEvent` is really just `Maybe` with different semantics, to avoid a potentially confusing `Maybe Maybe`.
+* a `DateEvent` that represents three things that can possibly happen during an update:
+  - `None`: Nothing
+  - `Picked Date`: The user might pick a date through clicking or typing
+  - `FailedInput InputError`: Or the user typed a date that is either invalid or disabled
+
+In most usecases it should suffice to match on `Picked Date`.
+Have a look at the `nightwash-simple` example for basic error handling with `InputError`.
 
 To create the settings to pass to `update`, DatePicker.defaultSettings` is provided to make it easier to use. You only have to override the settings that you are interested in.
 
@@ -92,24 +98,25 @@ update msg model =
     case msg of
         ...
 
-         SetDatePicker msg ->
+         SetDatePicker subMsg ->
             let
                 ( newDatePicker, datePickerCmd, dateEvent ) =
-                    DatePicker.update someSettings msg model.startDatePicker
+                    DatePicker.update someSettings subMsg model.startDatePicker
 
                 date =
                     case dateEvent of
-                        NoChange ->
+                        Picked newDate ->
+                            Just newDate
+
+                        _ ->
                             model.date
 
-                        Changed newDate ->
-                            newDate |> processDate
             in
-                { model
+                ({ model
                     | date = date
                     , datePicker = newDatePicker
                 }
-                    ! [ Cmd.map SetDatePicker datePickerCmd ]
+                , Cmd.map SetDatePicker datePickerCmd)
 
 ```
 
