@@ -1,9 +1,10 @@
 module Simple exposing (main)
 
-import Date exposing (Date, Weekday(..), day, weekday, month, year)
+import Date exposing (Date, day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, h1, text)
 import Browser
+import Time exposing (Weekday(..))
 
 type Msg
     = ToDatePicker DatePicker.Msg
@@ -70,7 +71,7 @@ view model =
                 h1 [] [ text "Pick a date" ]
 
             Just date ->
-                h1 [] [ text <| Date.toFormattedString "MMM d, yyyy" date ]
+                h1 [] [ text <| Date.format "MMM d, yyyy" date ]
         , DatePicker.view model.date settings model.datePicker
             |> Html.map ToDatePicker
         ]

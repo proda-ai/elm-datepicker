@@ -9,7 +9,8 @@ module DatePicker.Date
         , yearRange
         )
 
-import Date exposing (Date, Unit(..), Interval(..), Weekday(..), Month(..), year, month, day)
+import Date exposing (Date, Unit(..), Interval(..), year, month, day)
+import Time exposing (Weekday(..), Month(..))
 
 type alias Year =
     Int
@@ -97,7 +98,7 @@ formatMonth month =
             "December"
 
 
-weekdayToInterval : Date.Weekday -> Date.Interval
+weekdayToInterval : Weekday -> Date.Interval
 weekdayToInterval weekday =
     case weekday of
         Mon ->

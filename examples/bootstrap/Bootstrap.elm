@@ -1,10 +1,11 @@
 module Bootstrap exposing (main)
 
-import Date exposing (Date, Weekday(..), day, weekday, month, year)
+import Date exposing (Date, day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, form, h1, input, label, text)
 import Html.Attributes exposing (class, type_, value)
 import Browser
+import Time exposing (Weekday(..))
 
 
 type Msg

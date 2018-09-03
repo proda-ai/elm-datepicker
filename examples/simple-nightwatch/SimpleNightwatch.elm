@@ -3,13 +3,13 @@ module SimpleNightwatch exposing (main)
 {-| This is a simple test suitable for automated browser testing (such as with nightwatch.js)
 -}
 
-import Date exposing (Date, Weekday(..), day, weekday, month, year)
+import Date exposing (Date, day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..), InputError(..))
 import Html exposing (Html, div, h1, h2, text, button)
 import Html.Attributes exposing (id)
 import Process
 import Task
-import Time
+import Time exposing (Weekday(..))
 import Browser
 
 
@@ -36,7 +36,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         moonLandingDate =
-            Date.fromCalendarDate 1969 Date.Jul 20
+            Date.fromCalendarDate 1969 Time.Jul 20
     in
         ( { date = Nothing
           , datePicker = DatePicker.initFromDate moonLandingDate
@@ -98,7 +98,7 @@ view ({ date, datePicker, error } as model) =
                 h1 [] [ text "Pick a date" ]
 
             Just d ->
-                h1 [] [ text <| Date.toFormattedString "MMM dd, yyyy" d ]
+                h1 [] [ text <| Date.format "MMM dd, yyyy" d ]
         , case error of
             Nothing ->
                 text ""

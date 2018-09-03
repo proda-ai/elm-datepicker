@@ -36,7 +36,7 @@ module DatePicker
 
 -}
 
-import Date exposing (Date, Weekday(..), Month, day, month, year)
+import Date exposing (Date, Month, day, month, year)
 import DatePicker.Date exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attrs exposing (placeholder, tabindex, type_, value, selected)
@@ -44,7 +44,7 @@ import Html.Events exposing (on, onBlur, onClick, onInput, onFocus, targetValue)
 import Html.Keyed
 import Json.Decode as Json
 import Task
-import Time
+import Time exposing (Weekday(..))
 
 
 {-| An opaque type representing messages that are passed inside the DatePicker.
@@ -133,7 +133,7 @@ defaultSettings =
         ]
     , isDisabled = always False
     , parser = Date.fromIsoString
-    , dateFormatter = Date.toFormattedString "yyyy/MM/dd"
+    , dateFormatter = Date.format "yyyy/MM/dd"
     , dayFormatter = formatDay
     , monthFormatter = formatMonth
     , yearFormatter = String.fromInt

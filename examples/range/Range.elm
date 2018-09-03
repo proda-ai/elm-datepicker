@@ -1,9 +1,10 @@
 module Range exposing (main)
 
-import Date exposing (Date, Weekday(..), day, weekday, month, year)
+import Date exposing (Date, day, weekday, month, year)
 import DatePicker exposing (defaultSettings, DateEvent(..))
 import Html exposing (Html, div, h1, text)
 import Browser
+import Time exposing (Weekday(..))
 
 
 type Msg
@@ -173,7 +174,7 @@ viewRange start end =
 
 formatDate : Date -> String
 formatDate d =
-    Date.toFormattedString "MMM dd, yyyy" d
+    Date.format "MMM dd, yyyy" d
 
 
 main : Program () Model Msg
