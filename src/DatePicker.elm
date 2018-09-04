@@ -1,25 +1,8 @@
-module DatePicker
-    exposing
-        ( Msg
-        , Settings
-        , DateEvent(..)
-        , InputError(..)
-        , DatePicker
-        , defaultSettings
-        , init
-        , initFromDate
-        , initFromDates
-        , update
-        , view
-        , pick
-        , isOpen
-        , between
-        , moreOrLess
-        , off
-        , from
-        , to
-        , focusedDate
-        )
+module DatePicker exposing
+    ( Msg, DateEvent(..), InputError(..), DatePicker
+    , init, initFromDate, initFromDates, update, view, isOpen, focusedDate
+    , Settings, defaultSettings, pick, between, moreOrLess, from, to, off
+    )
 
 {-| A customizable date picker component.
 
@@ -39,8 +22,8 @@ module DatePicker
 import Date exposing (Date, Month, day, month, year)
 import DatePicker.Date exposing (..)
 import Html exposing (..)
-import Html.Attributes as Attrs exposing (placeholder, tabindex, type_, value, selected)
-import Html.Events exposing (on, onBlur, onClick, onInput, onFocus, targetValue)
+import Html.Attributes as Attrs exposing (placeholder, selected, tabindex, type_, value)
+import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, targetValue)
 import Html.Keyed
 import Json.Decode as Json
 import Task
@@ -157,6 +140,7 @@ between : Int -> Int -> YearRange
 between start end =
     if start > end then
         Between end start
+
     else
         Between start end
 
@@ -215,7 +199,7 @@ for the date picker to behave correctly.
             ( datePicker, datePickerFx ) =
                 DatePicker.init
         in
-            ({ picker = datePicker },  Cmd.map ToDatePicker datePickerfx)
+        ( { picker = datePicker }, Cmd.map ToDatePicker datePickerfx )
 
 -}
 init : ( DatePicker, Cmd Msg )
@@ -234,7 +218,7 @@ init =
 {-| Initialize a DatePicker with a given Date
 
     init date =
-        ({ picker = DatePicker.initFromDate date }, Cmd.none)
+        ( { picker = DatePicker.initFromDate date }, Cmd.none )
 
 -}
 initFromDate : Date -> DatePicker
@@ -251,7 +235,7 @@ initFromDate date =
 {-| Initialize a DatePicker with a date for today and Maybe a date picked
 
     init today date =
-        ({ picker = DatePicker.initFromDates today date }, Cmd.none)
+        ( { picker = DatePicker.initFromDates today date }, Cmd.none )
 
 -}
 initFromDates : Date -> Maybe Date -> DatePicker
@@ -269,7 +253,7 @@ prepareDates : Date -> Weekday -> { currentMonth : Date, currentDates : List Dat
 prepareDates date firstDayOfWeek =
     let
         weekdayAsInterval =
-            (weekdayToInterval firstDayOfWeek)
+            weekdayToInterval firstDayOfWeek
 
         firstOfMonth =
             Date.fromCalendarDate (year date) (month date) 1
@@ -285,9 +269,9 @@ prepareDates date firstDayOfWeek =
             Date.add Date.Months 1 firstOfMonth
                 |> Date.ceiling weekdayAsInterval
     in
-        { currentMonth = date
-        , currentDates = Date.range Date.Day 1 start end
-        }
+    { currentMonth = date
+    , currentDates = Date.range Date.Day 1 start end
+    }
 
 
 {-| Expose if the datepicker is open
@@ -307,23 +291,25 @@ focusedDate (DatePicker model) =
 {-| The event resulting from a `DatePicker.update`.
 Three things can happen:
 
-* Nothing
-* The user might pick a date through clicking or typing
-* Or the user typed a date that is either invalid or disabled
+  - Nothing
+  - The user might pick a date through clicking or typing
+  - Or the user typed a date that is either invalid or disabled
 
 If you do not care about case error handling for invalid inputs, just matching on `Picked` should suffice.
 
 Have a look at the `nightwash-simple` example for basic error handling with `InputError`.
+
 -}
 type DateEvent
     = None
     | FailedInput InputError
     | Picked Date
 
+
 {-| When typing a date it can go wrong in two ways:
 
-* `Invalid String`: the typed string cannot be parsed into a date. The error string is given be the parser defined in the settings.
-* `Disabled Date`: a valid date was typed, but it is disabled as defined in the settings.
+  - `Invalid String`: the typed string cannot be parsed into a date. The error string is given be the parser defined in the settings.
+  - `Disabled Date`: a valid date was typed, but it is disabled as defined in the settings.
 
 -}
 type InputError
@@ -369,32 +355,33 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
                                 Ok date ->
                                     if settings.isDisabled date then
                                         FailedInput <| Disabled date
+
                                     else
                                         Picked date
 
                                 Err e ->
                                     FailedInput <| Invalid e
                     in
-                        ( DatePicker
-                            { model
-                                | inputText =
-                                    case dateEvent of
-                                        Picked _ ->
-                                            Nothing
+                    ( DatePicker
+                        { model
+                            | inputText =
+                                case dateEvent of
+                                    Picked _ ->
+                                        Nothing
 
-                                        _ ->
-                                            model.inputText
-                                , focused =
-                                    case dateEvent of
-                                        Picked date ->
-                                            Just date
+                                    _ ->
+                                        model.inputText
+                            , focused =
+                                case dateEvent of
+                                    Picked date ->
+                                        Just date
 
-                                        _ ->
-                                            model.focused
-                            }
-                        , Cmd.none
-                        , dateEvent
-                        )
+                                    _ ->
+                                        model.focused
+                        }
+                    , Cmd.none
+                    , dateEvent
+                    )
 
         Focus ->
             ( DatePicker { model | open = True, forceOpen = False }, Cmd.none, None )
@@ -475,16 +462,17 @@ view pickedDate settings (DatePicker ({ open } as model)) =
                 ]
 
         containerClassList =
-            ( "container", True ) :: settings.containerClassList
+            ( settings.classNamespace ++ "container", True ) :: settings.containerClassList
     in
-        div
-            [ Attrs.classList containerClassList ]
-            [ dateInput
-            , if open then
-                datePicker pickedDate settings model
-              else
-                text ""
-            ]
+    div
+        [ Attrs.classList containerClassList ]
+        [ dateInput
+        , if open then
+            datePicker pickedDate settings model
+
+          else
+            text ""
+        ]
 
 
 datePicker : Maybe Date -> Settings -> Model -> Html Msg
@@ -500,7 +488,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
             mkClass settings
 
         firstDayOffset =
-            (Date.weekdayToNumber settings.firstDayOfWeek) - 1
+            Date.weekdayToNumber settings.firstDayOfWeek - 1
 
         arrow className message =
             a
@@ -516,13 +504,13 @@ datePicker pickedDate settings ({ focused, today } as model) =
                 |> Maybe.withDefault False
 
         isToday d =
-            (Date.toRataDie d == Date.toRataDie today)
+            Date.toRataDie d == Date.toRataDie today
 
         isOtherMonth d =
-            (month currentDate /= month d)
+            month currentDate /= month d
 
         dayList =
-            (groupDates currentDates)
+            groupDates currentDates
                 |> List.map
                     (\rowDays ->
                         tr [ class "row" ]
@@ -548,41 +536,42 @@ datePicker pickedDate settings ({ focused, today } as model) =
                     (yearRange { currentMonth = currentMonth, today = today } settings.changeYear)
                 )
     in
-        div
-            [ class "picker"
-            , Html.Events.stopPropagationOn "mousedown" <| Json.succeed ( MouseDown, True )
-            , Html.Events.stopPropagationOn "mouseup" <| Json.succeed ( MouseUp, True )
-            ]
-            [ div [ class "picker-header" ]
-                [ div [ class "prev-container" ]
-                    [ arrow "prev" (ChangeFocus (Date.add Date.Months -1 currentDate)) ]
-                , div [ class "month-container" ]
-                    [ span [ class "month" ]
-                        [ text <| settings.monthFormatter <| month currentMonth ]
-                    , span [ class "year" ]
-                        [ if not (yearRangeActive settings.changeYear) then
-                            text <| settings.yearFormatter <| year currentMonth
-                          else
-                            Html.Keyed.node "span" [] [ ( String.fromInt (year currentMonth), dropdownYear ) ]
-                        ]
+    div
+        [ class "picker"
+        , Html.Events.stopPropagationOn "mousedown" <| Json.succeed ( MouseDown, True )
+        , Html.Events.stopPropagationOn "mouseup" <| Json.succeed ( MouseUp, True )
+        ]
+        [ div [ class "picker-header" ]
+            [ div [ class "prev-container" ]
+                [ arrow "prev" (ChangeFocus (Date.add Date.Months -1 currentDate)) ]
+            , div [ class "month-container" ]
+                [ span [ class "month" ]
+                    [ text <| settings.monthFormatter <| month currentMonth ]
+                , span [ class "year" ]
+                    [ if not (yearRangeActive settings.changeYear) then
+                        text <| settings.yearFormatter <| year currentMonth
+
+                      else
+                        Html.Keyed.node "span" [] [ ( String.fromInt (year currentMonth), dropdownYear ) ]
                     ]
-                , div [ class "next-container" ]
-                    [ arrow "next" (ChangeFocus (Date.add Date.Months 1 currentDate)) ]
                 ]
-            , table [ class "table" ]
-                [ thead [ class "weekdays" ]
-                    [ tr []
-                        ([ Mon, Tue, Wed, Thu, Fri, Sat, Sun ]
-                            |> List.repeat 2
-                            |> List.concat
-                            |> List.drop firstDayOffset
-                            |> List.take 7
-                            |> List.map (\d -> td [ class "dow" ] [ text <| settings.dayFormatter d ])
-                        )
-                    ]
-                , tbody [ class "days" ] dayList
-                ]
+            , div [ class "next-container" ]
+                [ arrow "next" (ChangeFocus (Date.add Date.Months 1 currentDate)) ]
             ]
+        , table [ class "table" ]
+            [ thead [ class "weekdays" ]
+                [ tr []
+                    ([ Mon, Tue, Wed, Thu, Fri, Sat, Sun ]
+                        |> List.repeat 2
+                        |> List.concat
+                        |> List.drop firstDayOffset
+                        |> List.take 7
+                        |> List.map (\d -> td [ class "dow" ] [ text <| settings.dayFormatter d ])
+                    )
+                ]
+            , tbody [ class "days" ] dayList
+            ]
+        ]
 
 
 viewDay : Settings -> (Date -> Bool) -> (Date -> Bool) -> (Date -> Bool) -> Date -> Html Msg
@@ -597,21 +586,22 @@ viewDay settings picked isOtherMonth isToday d =
         props =
             if not disabled then
                 [ onClick <| Pick d ]
+
             else
                 []
     in
-        td
-            ([ classList
-                [ ( "day", True )
-                , ( "disabled", disabled )
-                , ( "picked", picked d )
-                , ( "today", isToday d )
-                , ( "other-month", isOtherMonth d )
-                ]
-             ]
-                ++ props
-            )
-            [ settings.cellFormatter <| String.fromInt <| Date.day d ]
+    td
+        ([ classList
+            [ ( "day", True )
+            , ( "disabled", disabled )
+            , ( "picked", picked d )
+            , ( "today", isToday d )
+            , ( "other-month", isOtherMonth d )
+            ]
+         ]
+            ++ props
+        )
+        [ settings.cellFormatter <| String.fromInt <| Date.day d ]
 
 
 {-| Turn a list of dates into a list of date rows with 7 columns per
@@ -628,10 +618,11 @@ groupDates dates =
                 x :: xxs ->
                     if i == 6 then
                         go 0 xxs [] (List.reverse (x :: racc) :: acc)
+
                     else
                         go (i + 1) xxs (x :: racc) acc
     in
-        go 0 dates [] []
+    go 0 dates [] []
 
 
 mkClass : Settings -> String -> Html.Attribute msg
