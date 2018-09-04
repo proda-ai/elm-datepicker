@@ -1,7 +1,7 @@
 module DatePicker exposing
     ( Msg, DateEvent(..), InputError(..), DatePicker
     , init, initFromDate, initFromDates, update, view, isOpen, focusedDate
-    , Settings, defaultSettings, pick, between, moreOrLess, from, to, off
+    , Settings, defaultSettings, pick, between, moreOrLess, from, to, off, open, close
     )
 
 {-| A customizable date picker component.
@@ -15,7 +15,7 @@ module DatePicker exposing
 
 # Settings
 
-@docs Settings, defaultSettings, pick, between, moreOrLess, from, to, off
+@docs Settings, defaultSettings, pick, between, moreOrLess, from, to, off, open, close
 
 -}
 
@@ -416,10 +416,32 @@ pick =
     Pick
 
 
+{-| Generate a message that will act as if the user has focused on the input element.
+This will open the datePicker
+
+    update datepickerSettings open datepicker
+
+-}
+open : Msg
+open =
+    Focus
+
+
+{-| Generate a message that will act as if the user has removed focus from the input element.
+This will close the datePicker
+
+    update datepickerSettings close datepicker
+
+-}
+close : Msg
+close =
+    Blur
+
+
 {-| The date picker view. The Date passed is whatever date it should treat as selected.
 -}
 view : Maybe Date -> Settings -> DatePicker -> Html Msg
-view pickedDate settings (DatePicker ({ open } as model)) =
+view pickedDate settings (DatePicker (model as datepicker)) =
     let
         class =
             mkClass settings
@@ -467,7 +489,7 @@ view pickedDate settings (DatePicker ({ open } as model)) =
     div
         [ Attrs.classList containerClassList ]
         [ dateInput
-        , if open then
+        , if model.open then
             datePicker pickedDate settings model
 
           else
