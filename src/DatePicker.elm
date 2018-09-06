@@ -443,9 +443,6 @@ close =
 view : Maybe Date -> Settings -> DatePicker -> Html Msg
 view pickedDate settings (DatePicker (model as datepicker)) =
     let
-        class =
-            mkClass settings
-
         potentialInputId =
             settings.inputId
                 |> Maybe.map Attrs.id
@@ -506,7 +503,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
         { currentMonth, currentDates } =
             prepareDates currentDate settings.firstDayOfWeek
 
-        class =
+        dpClass =
             mkClass settings
 
         firstDayOffset =
@@ -559,17 +556,17 @@ datePicker pickedDate settings ({ focused, today } as model) =
                 )
     in
     div
-        [ class "picker"
+        [ dpClass "picker"
         , Html.Events.stopPropagationOn "mousedown" <| Json.succeed ( MouseDown, True )
         , Html.Events.stopPropagationOn "mouseup" <| Json.succeed ( MouseUp, True )
         ]
-        [ div [ class "picker-header" ]
-            [ div [ class "prev-container" ]
+        [ div [ dpClass "picker-header" ]
+            [ div [ dpClass "prev-container" ]
                 [ arrow "prev" (ChangeFocus (Date.add Date.Months -1 currentDate)) ]
-            , div [ class "month-container" ]
-                [ span [ class "month" ]
+            , div [ dpClass "month-container" ]
+                [ span [ dpClass "month" ]
                     [ text <| settings.monthFormatter <| month currentMonth ]
-                , span [ class "year" ]
+                , span [ dpClass "year" ]
                     [ if not (yearRangeActive settings.changeYear) then
                         text <| settings.yearFormatter <| year currentMonth
 
@@ -577,21 +574,21 @@ datePicker pickedDate settings ({ focused, today } as model) =
                         Html.Keyed.node "span" [] [ ( String.fromInt (year currentMonth), dropdownYear ) ]
                     ]
                 ]
-            , div [ class "next-container" ]
+            , div [ dpClass "next-container" ]
                 [ arrow "next" (ChangeFocus (Date.add Date.Months 1 currentDate)) ]
             ]
-        , table [ class "table" ]
-            [ thead [ class "weekdays" ]
+        , table [ dpClass "table" ]
+            [ thead [ dpClass "weekdays" ]
                 [ tr []
                     ([ Mon, Tue, Wed, Thu, Fri, Sat, Sun ]
                         |> List.repeat 2
                         |> List.concat
                         |> List.drop firstDayOffset
                         |> List.take 7
-                        |> List.map (\d -> td [ class "dow" ] [ text <| settings.dayFormatter d ])
+                        |> List.map (\d -> td [ dpClass "dow" ] [ text <| settings.dayFormatter d ])
                     )
                 ]
-            , tbody [ class "days" ] dayList
+            , tbody [ dpClass "days" ] dayList
             ]
         ]
 
