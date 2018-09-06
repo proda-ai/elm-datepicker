@@ -1,16 +1,16 @@
-module DatePicker.Date
-    exposing
-        ( YearRange(..)
-        , initDate
-        , formatDay
-        , formatMonth
-        , weekdayToInterval
-        , changeYear
-        , yearRange
-        )
+module DatePicker.Date exposing
+    ( YearRange(..)
+    , changeYear
+    , formatDay
+    , formatMonth
+    , initDate
+    , weekdayToInterval
+    , yearRange
+    )
 
-import Date exposing (Date, Unit(..), Interval(..), year, month, day)
-import Time exposing (Weekday(..), Month(..))
+import Date exposing (Date, Interval(..), Unit(..), day, month, year)
+import Time exposing (Month(..), Weekday(..))
+
 
 type alias Year =
     Int
@@ -122,6 +122,7 @@ weekdayToInterval weekday =
         Sun ->
             Sunday
 
+
 changeYear : Date -> String -> Date
 changeYear current newYear =
     case String.toInt newYear of
@@ -137,7 +138,7 @@ yearRange : { currentMonth : Date, today : Date } -> YearRange -> List Int
 yearRange { currentMonth, today } range =
     case range of
         MoreOrLess num ->
-            List.range ((year currentMonth) - num) ((year currentMonth) + num)
+            List.range (year currentMonth - num) (year currentMonth + num)
 
         Between start end ->
             List.range start end
