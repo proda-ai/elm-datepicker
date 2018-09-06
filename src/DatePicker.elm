@@ -421,6 +421,7 @@ This will open the datePicker
 
     update datepickerSettings open datepicker
 
+Example usage is demonstrated in the `simple-nightwash`-example.
 -}
 open : Msg
 open =
@@ -432,6 +433,8 @@ This will close the datePicker
 
     update datepickerSettings close datepicker
 
+
+Example usage is demonstrated in `simple-nightwash`-example.
 -}
 close : Msg
 close =
@@ -511,7 +514,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
 
         arrow className message =
             a
-                [ class className
+                [ dpClass className
                 , onClick message
                 , tabindex -1
                 ]
@@ -532,7 +535,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
             groupDates currentDates
                 |> List.map
                     (\rowDays ->
-                        tr [ class "row" ]
+                        tr [ dpClass "row" ]
                             (List.map (viewDay settings picked isOtherMonth isToday) rowDays)
                     )
 
@@ -550,7 +553,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
 
         dropdownYear =
             Html.Keyed.node "select"
-                [ onChange (changeYear currentDate >> ChangeFocus), class "year-menu" ]
+                [ onChange (changeYear currentDate >> ChangeFocus), dpClass "year-menu" ]
                 (List.indexedMap yearOption
                     (yearRange { currentMonth = currentMonth, today = today } settings.changeYear)
                 )

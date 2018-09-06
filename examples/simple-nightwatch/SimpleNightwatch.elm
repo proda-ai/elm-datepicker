@@ -3,14 +3,15 @@ module SimpleNightwatch exposing (main)
 {-| This is a simple test suitable for automated browser testing (such as with nightwatch.js)
 -}
 
-import Date exposing (Date, day, weekday, month, year)
-import DatePicker exposing (defaultSettings, DateEvent(..), InputError(..))
-import Html exposing (Html, div, h1, h2, text, button)
+import Browser
+import Date exposing (Date, day, month, weekday, year)
+import DatePicker exposing (DateEvent(..), InputError(..), defaultSettings)
+import Html exposing (Html, button, div, h1, h2, text)
 import Html.Attributes exposing (id)
+import Html.Events exposing (onClick)
 import Process
 import Task
 import Time exposing (Weekday(..))
-import Browser
 
 
 type Msg
@@ -27,9 +28,9 @@ type alias Model =
 
 settings : DatePicker.Settings
 settings =
-     { defaultSettings
-         | isDisabled = (\date -> modBy 2 (Date.toRataDie date) == 0)
-     }
+    { defaultSettings
+        | isDisabled = \date -> modBy 2 (Date.toRataDie date) == 0
+    }
 
 
 init : ( Model, Cmd Msg )
@@ -38,14 +39,14 @@ init =
         moonLandingDate =
             Date.fromCalendarDate 1969 Time.Jul 20
     in
-        ( { date = Nothing
-          , datePicker = DatePicker.initFromDate moonLandingDate
-          , error = Nothing
-          }
-          -- trigger a NoOp command after two seconds. This is used to test
-          -- that re-renders of the app do not cause things to dissapear.
-        , delayedNoOpCmd { seconds = 2 }
-        )
+    ( { date = Nothing
+      , datePicker = DatePicker.initFromDate moonLandingDate
+      , error = Nothing
+      }
+      -- trigger a NoOp command after two seconds. This is used to test
+      -- that re-renders of the app do not cause things to dissapear.
+    , delayedNoOpCmd { seconds = 2 }
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,13 +79,13 @@ update msg ({ date, datePicker } as model) =
                         None ->
                             model.error
             in
-                ( { model
-                    | date = newDate
-                    , datePicker = newDatePicker
-                    , error = error
-                  }
-                , Cmd.map ToDatePicker datePickerFx
-                )
+            ( { model
+                | date = newDate
+                , datePicker = newDatePicker
+                , error = error
+              }
+            , Cmd.map ToDatePicker datePickerFx
+            )
 
         NoOp ->
             ( model, Cmd.none )
@@ -107,6 +108,10 @@ view ({ date, datePicker, error } as model) =
                 h2 [ id "error" ] [ text err ]
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
+        , div [Html.Attributes.style "padding-top" "250px"]
+            [ button [ id "openpickerbtn", onClick <| ToDatePicker DatePicker.open ] [ text "Open Datepicker" ]
+            , button [ id "closepickerbtn", onClick <| ToDatePicker DatePicker.close ] [ text "Close Datepicker" ]
+            ]
         ]
 
 

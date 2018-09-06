@@ -2,7 +2,8 @@ const url = "http://localhost:8000/examples/simple-nightwatch/index.html";
 const textInputSelector = ".elm-datepicker--input";
 const topLeftDaySelector = ".elm-datepicker--row:first-child .elm-datepicker--day:first-child";
 const errorMsgSelector = "#error"
-
+const openBtn = "#openpickerbtn"
+const closeBtn = "#closepickerbtn"
 
 const defaultWait = 1000;
 
@@ -86,6 +87,21 @@ module.exports = {
     client.expect.element(errorMsgSelector).to.not.be.present.before(defaultWait);
     client.end();
   },
+
+  'Open and Open Msg should open and the Picker' : function (client) {
+    client.url(url);
+    client.expect.element(openBtn).to.be.present.before(defaultWait);
+    client.click(openBtn);
+    client.expect.element(topLeftDaySelector).to.be.present.before(defaultWait);
+    client.click(closeBtn);
+    client.expect.element(topLeftDaySelector).to.not.be.present.before(defaultWait);
+    client.click(openBtn);
+    client.click(topLeftDaySelector);
+    client.expect.element(textInputSelector).value.to.equal("1969/06/29").before(defaultWait);
+    client.expect.element(errorMsgSelector).to.not.be.present.before(defaultWait);
+    client.end();
+  },
+
 
   'Manually entered text should not be cleared when the view re-renders' : function (client) {
 
