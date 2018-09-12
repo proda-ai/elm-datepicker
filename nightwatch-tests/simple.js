@@ -88,7 +88,7 @@ module.exports = {
     client.end();
   },
 
-  'Open and Open Msg should open and the Picker' : function (client) {
+  'Open and Close Msg should open and the Picker' : function (client) {
     client.url(url);
     client.expect.element(openBtn).to.be.present.before(defaultWait);
     client.click(openBtn);
@@ -96,6 +96,7 @@ module.exports = {
     client.click(closeBtn);
     client.expect.element(topLeftDaySelector).to.not.be.present.before(defaultWait);
     client.click(openBtn);
+    client.expect.element(topLeftDaySelector).to.be.present.before(defaultWait);
     client.click(topLeftDaySelector);
     client.expect.element(textInputSelector).value.to.equal("1969/06/29").before(defaultWait);
     client.expect.element(errorMsgSelector).to.not.be.present.before(defaultWait);
