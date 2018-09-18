@@ -22,7 +22,7 @@ During the port to 0.19 two breaking changes were made:
 ## Install
 
 ``` shell
-elm package install CurrySoftware/elm-datepicker
+elm install CurrySoftware/elm-datepicker
 ```
 
 ## Usage
