@@ -310,7 +310,7 @@ type InputError
     | Disabled Date
 
 
-{-| The date picker update function. The two tuple member represents a user action to change the
+{-| The date picker update function. The second tuple member represents a user action to change the
 date.
 -}
 update : Settings -> Msg -> DatePicker -> ( DatePicker, DateEvent )
