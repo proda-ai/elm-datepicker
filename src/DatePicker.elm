@@ -69,16 +69,9 @@ type alias Settings =
 type alias Model =
     { open : Bool
     , forceOpen : Bool
-    , focused :
-        Maybe Date
-
-    -- date currently center-focused by picker, but not necessarily chosen
-    , inputText :
-        Maybe String
-    , today :
-        Date
-
-    -- actual, current day as far as we know
+    , focused : Maybe Date -- date currently center-focused by picker, but not necessarily chosen
+    , inputText : Maybe String
+    , today : Date -- actual, current day as far as we know
     }
 
 
@@ -317,17 +310,17 @@ type InputError
     | Disabled Date
 
 
-{-| The date picker update function. The third tuple member represents a user action to change the
+{-| The date picker update function. The two tuple member represents a user action to change the
 date.
 -}
-update : Settings -> Msg -> DatePicker -> ( DatePicker, Cmd Msg, DateEvent )
+update : Settings -> Msg -> DatePicker -> ( DatePicker, DateEvent )
 update settings msg (DatePicker ({ forceOpen, focused } as model)) =
     case msg of
         CurrentDate date ->
-            ( DatePicker { model | focused = Just date, today = date }, Cmd.none, None )
+            ( DatePicker { model | focused = Just date, today = date }, None )
 
         ChangeFocus date ->
-            ( DatePicker { model | focused = Just date }, Cmd.none, None )
+            ( DatePicker { model | focused = Just date }, None )
 
         Pick date ->
             ( DatePicker <|
@@ -336,17 +329,16 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
                     , inputText = Nothing
                     , focused = Nothing
                 }
-            , Cmd.none
             , Picked date
             )
 
         Text text ->
-            ( DatePicker { model | inputText = Just text }, Cmd.none, None )
+            ( DatePicker { model | inputText = Just text }, None )
 
         SubmitText ->
             case forceOpen of
                 True ->
-                    ( DatePicker model, Cmd.none, None )
+                    ( DatePicker model, None )
 
                 False ->
                     let
@@ -379,21 +371,20 @@ update settings msg (DatePicker ({ forceOpen, focused } as model)) =
                                     _ ->
                                         model.focused
                         }
-                    , Cmd.none
                     , dateEvent
                     )
 
         Focus ->
-            ( DatePicker { model | open = True, forceOpen = False }, Cmd.none, None )
+            ( DatePicker { model | open = True, forceOpen = False }, None )
 
         Blur ->
-            ( DatePicker { model | open = forceOpen }, Cmd.none, None )
+            ( DatePicker { model | open = forceOpen }, None )
 
         MouseDown ->
-            ( DatePicker { model | forceOpen = True }, Cmd.none, None )
+            ( DatePicker { model | forceOpen = True }, None )
 
         MouseUp ->
-            ( DatePicker { model | forceOpen = False }, Cmd.none, None )
+            ( DatePicker { model | forceOpen = False }, None )
 
 
 {-| Generate a message that will act as if the user has chosen a certain date,
@@ -422,6 +413,7 @@ This will open the datePicker
     update datepickerSettings open datepicker
 
 Example usage is demonstrated in the `simple-nightwash`-example.
+
 -}
 open : Msg
 open =
@@ -433,8 +425,8 @@ This will close the datePicker
 
     update datepickerSettings close datepicker
 
-
 Example usage is demonstrated in `simple-nightwash`-example.
+
 -}
 close : Msg
 close =

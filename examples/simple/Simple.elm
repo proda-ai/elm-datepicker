@@ -1,10 +1,11 @@
 module Simple exposing (main)
 
-import Date exposing (Date, day, weekday, month, year)
-import DatePicker exposing (defaultSettings, DateEvent(..))
-import Html exposing (Html, div, h1, text)
 import Browser
+import Date exposing (Date, day, month, weekday, year)
+import DatePicker exposing (DateEvent(..), defaultSettings)
+import Html exposing (Html, div, h1, text)
 import Time exposing (Weekday(..))
+
 
 type Msg
     = ToDatePicker DatePicker.Msg
@@ -23,7 +24,7 @@ settings =
             [ Sat, Sun ]
                 |> List.member (weekday date)
     in
-        { defaultSettings | isDisabled = isDisabled }
+    { defaultSettings | isDisabled = isDisabled }
 
 
 init : ( Model, Cmd Msg )
@@ -32,11 +33,11 @@ init =
         ( datePicker, datePickerFx ) =
             DatePicker.init
     in
-        ( { date = Nothing
-          , datePicker = datePicker
-          }
-        , Cmd.map ToDatePicker datePickerFx
-        )
+    ( { date = Nothing
+      , datePicker = datePicker
+      }
+    , Cmd.map ToDatePicker datePickerFx
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -44,7 +45,7 @@ update msg ({ date, datePicker } as model) =
     case msg of
         ToDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerFx, dateEvent ) =
+                ( newDatePicker, dateEvent ) =
                     DatePicker.update settings subMsg datePicker
 
                 newDate =
@@ -55,12 +56,12 @@ update msg ({ date, datePicker } as model) =
                         _ ->
                             date
             in
-                ( { model
-                    | date = newDate
-                    , datePicker = newDatePicker
-                  }
-                , Cmd.map ToDatePicker datePickerFx
-                )
+            ( { model
+                | date = newDate
+                , datePicker = newDatePicker
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
@@ -75,6 +76,7 @@ view model =
         , DatePicker.view model.date settings model.datePicker
             |> Html.map ToDatePicker
         ]
+
 
 main : Program () Model Msg
 main =

@@ -54,7 +54,7 @@ update msg ({ date, datePicker } as model) =
     case msg of
         ToDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerFx, dateEvent ) =
+                ( newDatePicker, dateEvent ) =
                     DatePicker.update settings subMsg datePicker
 
                 newDate =
@@ -84,7 +84,7 @@ update msg ({ date, datePicker } as model) =
                 , datePicker = newDatePicker
                 , error = error
               }
-            , Cmd.map ToDatePicker datePickerFx
+            , Cmd.none
             )
 
         NoOp ->
@@ -108,7 +108,7 @@ view ({ date, datePicker, error } as model) =
                 h2 [ id "error" ] [ text err ]
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
-        , div [Html.Attributes.style "padding-top" "250px"]
+        , div [ Html.Attributes.style "padding-top" "250px" ]
             [ button [ id "openpickerbtn", onClick <| ToDatePicker DatePicker.open ] [ text "Open Datepicker" ]
             , button [ id "closepickerbtn", onClick <| ToDatePicker DatePicker.close ] [ text "Close Datepicker" ]
             ]
