@@ -1,10 +1,10 @@
 module Bootstrap exposing (main)
 
-import Date exposing (Date, day, weekday, month, year)
-import DatePicker exposing (defaultSettings, DateEvent(..))
+import Browser
+import Date exposing (Date, day, month, weekday, year)
+import DatePicker exposing (DateEvent(..), defaultSettings)
 import Html exposing (Html, div, form, h1, input, label, text)
 import Html.Attributes exposing (class, type_, value)
-import Browser
 import Time exposing (Weekday(..))
 
 
@@ -25,12 +25,12 @@ settings =
             [ Sat, Sun ]
                 |> List.member (weekday date)
     in
-        { defaultSettings
-            | isDisabled = isDisabled
-            , inputClassList = [ ( "form-control", True ) ]
-            , inputName = Just "date"
-            , inputId = Just "date-field"
-        }
+    { defaultSettings
+        | isDisabled = isDisabled
+        , inputClassList = [ ( "form-control", True ) ]
+        , inputName = Just "date"
+        , inputId = Just "date-field"
+    }
 
 
 init : ( Model, Cmd Msg )
@@ -39,11 +39,11 @@ init =
         ( datePicker, datePickerFx ) =
             DatePicker.init
     in
-        ( { date = Nothing
-          , datePicker = datePicker
-          }
-        , Cmd.map ToDatePicker datePickerFx
-        )
+    ( { date = Nothing
+      , datePicker = datePicker
+      }
+    , Cmd.map ToDatePicker datePickerFx
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,21 +51,21 @@ update msg ({ datePicker } as model) =
     case msg of
         ToDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerFx, event ) =
+                ( newDatePicker, event ) =
                     DatePicker.update settings subMsg datePicker
             in
-                ( { model
-                    | date =
-                        case event of
-                            Picked date ->
-                                Just date
+            ( { model
+                | date =
+                    case event of
+                        Picked date ->
+                            Just date
 
-                            _ ->
-                                model.date
-                    , datePicker = newDatePicker
-                  }
-                , Cmd.map ToDatePicker datePickerFx
-                )
+                        _ ->
+                            model.date
+                , datePicker = newDatePicker
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
@@ -85,6 +85,7 @@ view ({ date, datePicker } as model) =
                 []
             ]
         ]
+
 
 main : Program () Model Msg
 main =

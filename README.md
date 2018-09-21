@@ -72,7 +72,6 @@ view model =
 To handle `Msg` in your update function, you should unwrap the `DatePicker.Msg` and pass it down to the `DatePicker.update` function. The `DatePicker.update` function returns:
 
 * the new model
-* any command
 * a `DateEvent` that represents three things that can possibly happen during an update:
   - `None`: Nothing
   - `Picked Date`: The user might pick a date through clicking or typing
@@ -100,7 +99,7 @@ update msg model =
 
          SetDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerCmd, dateEvent ) =
+                ( newDatePicker, dateEvent ) =
                     DatePicker.update someSettings subMsg model.startDatePicker
 
                 date =
@@ -116,7 +115,7 @@ update msg model =
                     | date = date
                     , datePicker = newDatePicker
                 }
-                , Cmd.map SetDatePicker datePickerCmd)
+                , Cmd.none)
 
 ```
 

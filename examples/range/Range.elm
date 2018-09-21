@@ -1,9 +1,9 @@
 module Range exposing (main)
 
-import Date exposing (Date, day, weekday, month, year)
-import DatePicker exposing (defaultSettings, DateEvent(..))
-import Html exposing (Html, div, h1, text)
 import Browser
+import Date exposing (Date, day, month, weekday, year)
+import DatePicker exposing (DateEvent(..), defaultSettings)
+import Html exposing (Html, div, h1, text)
 import Time exposing (Weekday(..))
 
 
@@ -47,12 +47,12 @@ startSettings endDate =
                     \d ->
                         Date.toRataDie d
                             > Date.toRataDie date
-                            || (commonSettings.isDisabled d)
+                            || commonSettings.isDisabled d
     in
-        { commonSettings
-            | placeholder = "Pick a start date"
-            , isDisabled = isDisabled
-        }
+    { commonSettings
+        | placeholder = "Pick a start date"
+        , isDisabled = isDisabled
+    }
 
 
 
@@ -72,12 +72,12 @@ endSettings startDate =
                     \d ->
                         Date.toRataDie d
                             < Date.toRataDie date
-                            || (commonSettings.isDisabled d)
+                            || commonSettings.isDisabled d
     in
-        { commonSettings
-            | placeholder = "Pick an end date"
-            , isDisabled = isDisabled
-        }
+    { commonSettings
+        | placeholder = "Pick an end date"
+        , isDisabled = isDisabled
+    }
 
 
 init : ( Model, Cmd Msg )
@@ -89,16 +89,16 @@ init =
         ( endDatePicker, endDatePickerFx ) =
             DatePicker.init
     in
-        ( { startDate = Nothing
-          , startDatePicker = startDatePicker
-          , endDate = Nothing
-          , endDatePicker = endDatePicker
-          }
-        , Cmd.batch
-            [ Cmd.map ToStartDatePicker startDatePickerFx
-            , Cmd.map ToEndDatePicker endDatePickerFx
-            ]
-        )
+    ( { startDate = Nothing
+      , startDatePicker = startDatePicker
+      , endDate = Nothing
+      , endDatePicker = endDatePicker
+      }
+    , Cmd.batch
+        [ Cmd.map ToStartDatePicker startDatePickerFx
+        , Cmd.map ToEndDatePicker endDatePickerFx
+        ]
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -106,7 +106,7 @@ update msg model =
     case msg of
         ToStartDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerFx, dateEvent ) =
+                ( newDatePicker, dateEvent ) =
                     DatePicker.update (startSettings model.endDate) subMsg model.startDatePicker
 
                 newDate =
@@ -117,16 +117,16 @@ update msg model =
                         _ ->
                             model.startDate
             in
-                ( { model
-                    | startDate = newDate
-                    , startDatePicker = newDatePicker
-                  }
-                , Cmd.map ToStartDatePicker datePickerFx
-                )
+            ( { model
+                | startDate = newDate
+                , startDatePicker = newDatePicker
+              }
+            , Cmd.none
+            )
 
         ToEndDatePicker subMsg ->
             let
-                ( newDatePicker, datePickerFx, dateEvent ) =
+                ( newDatePicker, dateEvent ) =
                     DatePicker.update (endSettings model.startDate) subMsg model.endDatePicker
 
                 newDate =
@@ -137,12 +137,12 @@ update msg model =
                         _ ->
                             model.endDate
             in
-                ( { model
-                    | endDate = newDate
-                    , endDatePicker = newDatePicker
-                  }
-                , Cmd.map ToEndDatePicker datePickerFx
-                )
+            ( { model
+                | endDate = newDate
+                , endDatePicker = newDatePicker
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
