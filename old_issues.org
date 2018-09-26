@@ -1,0 +1,4 @@
+| Id  | Title                                                                       | Notes                                                                            |
+|-----+-----------------------------------------------------------------------------+----------------------------------------------------------------------------------|
+| #84 | Pass settings as parameters only in one of update/view                      | Would need to seperate out parsing and isDisabled in update. Not straightforward |
+| #78 | Bug: datepicker doesn't close after switching months without picking a date | Still valid. No straighforward fix                                               |
