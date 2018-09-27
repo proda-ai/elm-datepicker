@@ -505,7 +505,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
             Date.weekdayToNumber settings.firstDayOfWeek - 1
 
         arrow className message =
-            a
+            button
                 [ dpClass className
                 , onClick message
                 , tabindex -1
