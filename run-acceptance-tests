@@ -23,6 +23,6 @@ CHROMEDRIVER_PID=$!
 # after nightwatch exits, kill background processes
 
 echo "shutting down Elm Reactor with pkill elm-reactor"
-pkill elm-reactor
+pkill -f "elm reactor"
 echo "shutting down Chromedriver with PID $CHROMEDRIVER_PID"
 kill "$CHROMEDRIVER_PID"
