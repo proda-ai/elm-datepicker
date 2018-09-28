@@ -18,6 +18,19 @@ During the port to 0.19 two breaking changes were made:
 - The --today-css class is now only added to cells that represent todays or the initialized date. Not the picked date. (Bugfix or Breaking change. You may decide)
 
 
+### Upgrading to 3.0.0
+
+3.0.0 introduces a change in emitted html and the packaged css.
+
+The next and previous month buttons previously were `a`-tags. These interfered with `Browser.application` apps.
+Thus, they were changed to `button`-tags. (see [issue #12](https://github.com/CurrySoftware/elm-datepicker/issues/12) for details).
+
+As this change in emitted html needs a change in css, we recommend you to add the following rule to your css when upgrading to 3.0.0:
+
+```css
+.elm-datepicker--prev,
+.elm-datepicker--next { background-color: inherit; }
+```
 
 ## Install
 
@@ -42,7 +55,7 @@ init : (Model, Cmd Msg)
         (
             { model | datePicker = datePicker },
             Cmd.map SetDatePicker datePickerCmd
-        )
+)        )
 ```
 
 The `DatePicker` can be displayed in a view using the `DatePicker.view` function. It returns its own
