@@ -509,6 +509,7 @@ datePicker pickedDate settings ({ focused, today } as model) =
                 [ dpClass className
                 , onClick message
                 , tabindex -1
+                , type_ "button"
                 ]
                 []
 

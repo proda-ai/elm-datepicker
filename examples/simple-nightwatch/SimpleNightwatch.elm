@@ -7,7 +7,7 @@ import Browser
 import Date exposing (Date, day, month, weekday, year)
 import DatePicker exposing (DateEvent(..), InputError(..), defaultSettings)
 import Html exposing (Html, button, div, h1, h2, text)
-import Html.Attributes exposing (id)
+import Html.Attributes exposing (id, type_)
 import Html.Events exposing (onClick)
 import Process
 import Task
@@ -109,8 +109,8 @@ view ({ date, datePicker, error } as model) =
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
         , div [ Html.Attributes.style "padding-top" "250px" ]
-            [ button [ id "openpickerbtn", onClick <| ToDatePicker DatePicker.open ] [ text "Open Datepicker" ]
-            , button [ id "closepickerbtn", onClick <| ToDatePicker DatePicker.close ] [ text "Close Datepicker" ]
+            [ button [ id "openpickerbtn", onClick <| ToDatePicker DatePicker.open, type_ "button" ] [ text "Open Datepicker" ]
+            , button [ id "closepickerbtn", onClick <| ToDatePicker DatePicker.close, type_ "button" ] [ text "Close Datepicker" ]
             ]
         ]
 
