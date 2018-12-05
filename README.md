@@ -1,6 +1,7 @@
 # History
 
 This is a fork of the `elm-community/elm-datepicker` package ported to support elm 0.19.
+
 `elm-datepicker` is a reusable date picker component in Elm.
 
 ## Dependencies
@@ -10,7 +11,7 @@ It uses its date representation: Dates without time and timezones.
 
 ## Breaking Changes
 
-During the port to 0.19 two breaking changes were made:
+During the port to 0.19, two breaking changes were made:
 
 
 - parseDate now defaults to Date.fromIsoString. Before it was elm-lang/Date.fromString which was much more flexible
@@ -90,8 +91,8 @@ To handle `Msg` in your update function, you should unwrap the `DatePicker.Msg` 
   - `Picked Date`: The user might pick a date through clicking or typing
   - `FailedInput InputError`: Or the user typed a date that is either invalid or disabled
 
-In most usecases it should suffice to match on `Picked Date`.
-Have a look at the `nightwash-simple` example for basic error handling with `InputError`.
+In most use cases, it should suffice to match on `Picked Date`.
+Have a look at the `simple-nightwatch` example for basic error handling with `InputError`.
 
 To create the settings to pass to `update`, `DatePicker.defaultSettings` is provided to make it easier to use. You only have to override the settings that you are interested in.
 
@@ -134,7 +135,7 @@ update msg model =
 
 ## Examples
 
-See the [examples][examples] folder or try it on ellie-app: [simple] example and [bootstrap] example.
+See the [examples][examples] folder, or try it on ellie-app: [simple] example and [bootstrap] example.
 
 [examples]: https://github.com/CurrySoftware/elm-datepicker/tree/master/examples
 [simple]: https://ellie-app.com/3WbsRpXXzJ5a1
@@ -163,7 +164,7 @@ from [here][scss].
 run `npm install`
 
 ### build the examples
-cd examples && make && cd ..
+`cd examples && make && cd ..`
 
 ### Run the tests
 `./run-acceptance-tests`
