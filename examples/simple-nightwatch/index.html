@@ -37,7 +37,7 @@
 
     <script src="simple-nightwatch.js"></script>
     <script>
-      Elm.SimpleNightwatch.init({node: document.getElementById("simple-nightwatch")});
+      var app = Elm.SimpleNightwatch.embed(document.getElementById("simple-nightwatch"));
     </script>
   </body>
 </html>

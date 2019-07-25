@@ -3,15 +3,14 @@ module SimpleNightwatch exposing (main)
 {-| This is a simple test suitable for automated browser testing (such as with nightwatch.js)
 -}
 
-import Browser
-import Date exposing (Date, day, month, weekday, year)
+import Compat.Date as Date exposing (Date, day, month, weekday, year)
+import Compat.Time as Time exposing (Weekday(..))
 import DatePicker exposing (DateEvent(..), InputError(..), defaultSettings)
 import Html exposing (Html, button, div, h1, h2, text)
 import Html.Attributes exposing (id, type_)
 import Html.Events exposing (onClick)
 import Process
 import Task
-import Time exposing (Weekday(..))
 
 
 type Msg
@@ -29,7 +28,7 @@ type alias Model =
 settings : DatePicker.Settings
 settings =
     { defaultSettings
-        | isDisabled = \date -> modBy 2 (Date.toRataDie date) == 0
+        | isDisabled = \date -> Date.toRataDie date % 2 == 0
     }
 
 
@@ -108,7 +107,7 @@ view ({ date, datePicker, error } as model) =
                 h2 [ id "error" ] [ text err ]
         , DatePicker.view date settings datePicker
             |> Html.map ToDatePicker
-        , div [ Html.Attributes.style "padding-top" "250px" ]
+        , div [ Html.Attributes.style [ ( "padding-top", "250px" ) ] ]
             [ button [ id "openpickerbtn", onClick <| ToDatePicker DatePicker.open, type_ "button" ] [ text "Open Datepicker" ]
             , button [ id "closepickerbtn", onClick <| ToDatePicker DatePicker.close, type_ "button" ] [ text "Close Datepicker" ]
             ]
@@ -121,10 +120,10 @@ delayedNoOpCmd { seconds } =
         |> Task.perform (\_ -> NoOp)
 
 
-main : Program () Model Msg
+main : Program Never Model Msg
 main =
-    Browser.element
-        { init = \_ -> init
+    Html.program
+        { init = init
         , view = view
         , update = update
         , subscriptions = \_ -> Sub.none

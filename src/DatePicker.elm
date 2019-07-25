@@ -19,15 +19,16 @@ module DatePicker exposing
 
 -}
 
-import Date exposing (Date, Month, day, month, year)
+import Compat.Date as Date exposing (Date, Month, day, month, year)
+import Compat.Time as Time exposing (Weekday(..))
 import DatePicker.Date exposing (..)
+import DatePicker.Util as String
 import Html exposing (..)
 import Html.Attributes as Attrs exposing (placeholder, selected, tabindex, type_, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, targetValue)
 import Html.Keyed
 import Json.Decode as Json
 import Task
-import Time exposing (Weekday(..))
 
 
 {-| An opaque type representing messages that are passed inside the DatePicker.
@@ -553,8 +554,11 @@ datePicker pickedDate settings ({ focused, today } as model) =
     in
     div
         [ dpClass "picker"
-        , Html.Events.stopPropagationOn "mousedown" <| Json.succeed ( MouseDown, True )
-        , Html.Events.stopPropagationOn "mouseup" <| Json.succeed ( MouseUp, True )
+
+        -- , Html.Events.stopPropagationOn "mousedown" <| Json.succeed ( MouseDown, True )
+        -- , Html.Events.stopPropagationOn "mouseup" <| Json.succeed ( MouseUp, True )
+        , Html.Events.onWithOptions "mousedown" { preventDefault = False, stopPropagation = True } <| Json.succeed MouseDown
+        , Html.Events.onWithOptions "mouseup" { preventDefault = False, stopPropagation = True } <| Json.succeed MouseUp
         ]
         [ div [ dpClass "picker-header" ]
             [ div [ dpClass "prev-container" ]

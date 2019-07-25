@@ -8,8 +8,8 @@ module DatePicker.Date exposing
     , yearRange
     )
 
-import Date exposing (Date, Interval(..), Unit(..), day, month, year)
-import Time exposing (Month(..), Weekday(..))
+import Compat.Date as Date exposing (Date, Interval(..), Unit(..), day, month, year)
+import Compat.Time as Time exposing (Month(..), Weekday(..))
 
 
 type alias Year =
@@ -125,7 +125,7 @@ weekdayToInterval weekday =
 
 changeYear : Date -> String -> Date
 changeYear current newYear =
-    case String.toInt newYear of
+    case String.toInt newYear |> Result.toMaybe of
         Just year ->
             Date.fromCalendarDate year (month current) (day current)
 

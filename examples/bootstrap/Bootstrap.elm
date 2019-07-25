@@ -1,11 +1,10 @@
 module Bootstrap exposing (main)
 
-import Browser
-import Date exposing (Date, day, month, weekday, year)
+import Compat.Date as Date exposing (Date, day, month, weekday, year)
+import Compat.Time as Time exposing (Weekday(..))
 import DatePicker exposing (DateEvent(..), defaultSettings)
 import Html exposing (Html, div, form, h1, input, label, text)
 import Html.Attributes exposing (class, type_, value)
-import Time exposing (Weekday(..))
 
 
 type Msg
@@ -87,10 +86,10 @@ view ({ date, datePicker } as model) =
         ]
 
 
-main : Program () Model Msg
+main : Program Never Model Msg
 main =
-    Browser.element
-        { init = \_ -> init
+    Html.program
+        { init = init
         , view = view
         , update = update
         , subscriptions = \_ -> Sub.none
